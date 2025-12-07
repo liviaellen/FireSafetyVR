@@ -1,105 +1,62 @@
-# Unity-PassthroughCameraAPISamples
+# Don't Let it Spark XR
 
-## Project Overview
+**Fire Safety Training Application for Meta Quest**
 
-The **Unity-PassthroughCameraAPISamples** project helps Unity developers access Quest camera data using the **PassthroughCameraAccess** component from the Mixed Reality Utility Kit (MRUK). This component provides direct access to headset cameras with enhanced functionality including:
-- **Precise timestamps** for better camera-world alignment
-- **Simultaneous access to both cameras** (left and right)
-- **Complete camera metadata** including intrinsics, extrinsics, and pose information
+An interactive VR fire safety training application that uses real-time AI object detection to help building inspectors and workers identify fire hazards in their actual environment.
 
-The project includes **five sample scenes** demonstrating various use cases:
+## Features
 
-| CameraToWorld | BrightnessEstimation | MultiObjectDectection | ShaderSample |
-|:-------------:|:--------------------:|:---------------------:|:------------:|
-| ![GIF 1](./Media/CameraToWorld.gif) | ![GIF 2](./Media/BrightnessEstimation.gif) | ![GIF 3](./Media/ObjectDetectionSentis.gif) | ![GIF 4](./Media/ShaderSample.gif) |
+### 🔍 Fire Inspector Mode (Press A)
+- Real-time object detection using AI
+- Automatic fire hazard identification
+- Visual markers for hazardous and safe objects
+- Document your safety assessments
 
-## Documentation
-
-For comprehensive guides, API reference, and tutorials, visit the official Meta Developers documentation:
-
-- **[Passthrough Camera API Overview](https://developers.meta.com/horizon/documentation/unity/unity-pca-overview)** - Introduction and key concepts
-- **[Getting Started Guide](https://developers.meta.com/horizon/documentation/unity/unity-pca-documentation)** - Setup, configuration, and usage instructions
-- **[Unity Sentis Integration](https://developers.meta.com/horizon/documentation/unity/unity-pca-sentis)** - Using ML/CV models with PCA
-- **[Migration Guide](https://developers.meta.com/horizon/documentation/unity/unity-pca-migration-from-webcamtexture)** - Migrating from WebCamTexture
+### 📚 Safety Quiz Mode (Press B)
+- Test your fire safety knowledge
+- Interactive quiz with real objects
+- Immediate feedback on answers
+- Percentage-based scoring
 
 ## Requirements
 
+- **Hardware:** Meta Quest 3 / Quest 3S
+- **OS:** Horizon OS v74 or higher
 - **Unity:** 6000.0.38f1 or newer
-- **Packages:**
-  - [Meta MRUK](https://assetstore.unity.com/packages/tools/integration/meta-mr-utility-kit-272450) (v81 or higher)
-  - [Unity Sentis](https://unity.com/sentis) (v2.1.3 for MultiObjectDetection sample)
-- **Hardware:** Quest 3 / Quest 3S with Horizon OS v74 or higher
-- **Permissions:** `horizonos.permission.HEADSET_CAMERA`
-- **Passthrough:** Must be enabled in your project
+- **Permissions:** Camera access required
 
-> [!NOTE]
-> You must use a physical headset to preview the passthrough camera. XR Simulator and Meta Horizon Link do not currently support passthrough cameras.
+## Controls
 
-## Download the Project
+- **A Button / Index Trigger**: Fire Inspector Mode or select objects
+- **B Button / Grip Trigger**: Safety Quiz Mode or answer "No"
+- **Menu Button**: Return to main menu
 
-First, ensure you have Git LFS installed by running this command:
+## How to Use
 
-```bash
-git lfs install
-```
+1. Launch the app on your Quest headset
+2. Grant camera permissions when prompted
+3. Choose a mode:
+   - **Fire Inspector (A)**: Scan your environment for fire hazards
+   - **Safety Quiz (B)**: Test your knowledge with a 3-question quiz
+4. Follow the on-screen instructions
 
-Then, clone this repo using the "Code" button above, or this command:
+## Fire Hazard Classification
 
-```bash
-git clone https://github.com/oculus-samples/Unity-PassthroughCameraApiSamples
-```
+Objects are classified based on fire risk:
+- **Hazardous**: Electronics (laptops, ovens, microwaves, toasters, TVs, phones)
+- **Safe**: People, furniture, books, non-electronic items
 
-## Project Content
+## Technical Stack
 
-The project contains **five sample scenes** that demonstrate how to use the **PassthroughCameraAccess** component to access Quest camera data. All sample code and resources are located in the [**`PassthroughCameraApiSamples`**](./Assets/PassthroughCameraApiSamples/) folder:
-
-### Samples
-
-* **[`CameraViewer`](./Assets/PassthroughCameraApiSamples/CameraViewer)** - Displays a 2D canvas with camera feed
-* **[`CameraToWorld`](./Assets/PassthroughCameraApiSamples/CameraToWorld)** - Aligns RGB camera pose with Passthrough and transforms 2D coordinates to 3D world space rays
-* **[`BrightnessEstimation`](./Assets/PassthroughCameraApiSamples/BrightnessEstimation)** - Adapts the experience based on environment brightness
-* **[`MultiObjectDetection`](./Assets/PassthroughCameraApiSamples/MultiObjectDetection)** - Uses Unity Sentis for real-world object recognition
-* **[`ShaderSample`](./Assets/PassthroughCameraApiSamples/ShaderSample)** - Applies custom GPU effects to camera texture
-
-### Additional Components
-
-* **[`PassthroughCamera`](./Assets/PassthroughCameraApiSamples/PassthroughCamera)** - C# classes and utilities for camera access
-* **[`StartScene`](./Assets/PassthroughCameraApiSamples/StartScene)** - Menu scene for switching between samples
-
-## Getting Started
-
-1. Clone the GitHub project as described [above](#download-the-project)
-2. Open the project with **Unity 6000.0.38f1** or newer
-3. Open a sample scene from the **[`PassthroughCameraApiSamples`](./Assets/PassthroughCameraApiSamples/)** folder
-4. Use **Meta > Tools > Project Setup Tool** to fix any configuration issues
-5. Build and deploy to your Quest 3/3S device
-
-For detailed setup instructions, API reference, and usage examples, see the **[Getting Started Guide](https://developers.meta.com/horizon/documentation/unity/unity-pca-documentation)**.
-
-## Learn More
-
-For comprehensive information about using the Passthrough Camera API:
-
-- **Setup & Configuration** - [Getting Started Guide](https://developers.meta.com/horizon/documentation/unity/unity-pca-documentation)
-- **Unity Sentis Integration** - [ML/CV with PCA](https://developers.meta.com/horizon/documentation/unity/unity-pca-sentis)
-- **Troubleshooting** - See the troubleshooting section in the [Getting Started Guide](https://developers.meta.com/horizon/documentation/unity/unity-pca-documentation#troubleshooting)
-
-## Report an Issue
-
-If you encounter any issues, please report them with:
-
-- **Unity Engine version**
-- **XR plugin** (Oculus XR or Open XR) and version number
-- **Quest device** model and **Horizon OS version**
-- **Logcat logs** (use `adb logcat >> log.txt`)
-- **Video or screenshot** of the issue
-- **Relevant information** about your use case
+- **Platform**: Unity 6000.0.38f1
+- **XR Framework**: Meta XR SDK with Passthrough Camera API
+- **AI Model**: YOLO object detection via Unity Sentis
+- **Performance**: Real-time on-device inference
 
 ## License
 
-The [`Oculus License`](./LICENSE.txt) applies to the SDK and supporting material. The [`MIT License`](./Assets/PassthroughCameraApiSamples/LICENSE.txt) applies to only certain, clearly marked documents. If an individual file does not indicate which license it is subject to, then the Oculus License applies.
+This project is built on Unity's Passthrough Camera API Samples. See LICENSE files for details.
 
-However,
-* Files from [`Assets/PassthroughCameraApiSamples/MultiObjectDetection/SentisInference/Model`](./Assets/PassthroughCameraApiSamples/MultiObjectDetection/SentisInference/Model) are licensed under [`MIT`](https://github.com/MultimediaTechLab/YOLO/blob/main/LICENSE).
+---
 
-See the [`CONTRIBUTING`](./CONTRIBUTING.md) file for how to help out.
+**Built with Unity • Powered by Unity Sentis • Designed for Meta Quest**
