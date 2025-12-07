@@ -14,7 +14,7 @@ namespace PassthroughCameraSamples.MultiObjectDetection
         [SerializeField] private Button m_yesButton;
         [SerializeField] private Button m_noButton;
         [SerializeField] private Text m_resultText;
-        [SerializeField] private Text m_scoreText;
+        [SerializeField] private Text m_currentScoreText; // Shows score during quiz
         [SerializeField] private GameObject m_finalScorePanel;
         [SerializeField] private Text m_finalScoreText;
         [SerializeField] private Text m_finalMessageText;
@@ -127,8 +127,8 @@ namespace PassthroughCameraSamples.MultiObjectDetection
 
             m_currentQuestionCount++;
 
-            // Update HUD score
-            if (m_scoreText) m_scoreText.text = $"Score: {m_currentScore}/{m_currentQuestionCount}";
+            // Update current score display
+            if (m_currentScoreText) m_currentScoreText.text = $"Score: {m_currentScore}/{m_currentQuestionCount}";
 
             StartCoroutine(NextQuestionRoutine());
         }
@@ -151,19 +151,9 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             if (m_finalScorePanel)
             {
                 m_finalScorePanel.SetActive(true);
-                int percentage = (int)((float)m_currentScore / m_questionsToAsk * 100);
-                m_finalScoreText.text = $"Final Score: {percentage}%";
-
-                if (m_currentScore == m_questionsToAsk)
-                {
-                    m_finalMessageText.text = "Perfect! You are a Safety Expert.";
-                    m_finalMessageText.color = Color.green;
-                }
-                else
-                {
-                    m_finalMessageText.text = "Good try! Keep learning.";
-                    m_finalMessageText.color = Color.yellow;
-                }
+                m_finalScoreText.text = "Quiz Complete!";
+                m_finalMessageText.text = "Keep learning and stay safe!";
+                m_finalMessageText.color = Color.yellow;
             }
         }
 
@@ -256,9 +246,23 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             m_resultText.alignment = TextAnchor.MiddleCenter;
             m_resultText.text = "";
             RectTransform rRt = rTextObj.GetComponent<RectTransform>();
-            rRt.anchorMin = new Vector2(0, 0.3f);
-            rRt.anchorMax = new Vector2(1, 0.5f);
+            rRt.anchorMin = new Vector2(0, 0.25f);
+            rRt.anchorMax = new Vector2(1, 0.45f);
             rRt.anchoredPosition = new Vector2(0, -80);
+
+            // Current Score Text (bottom of panel)
+            GameObject scoreTextObj = new GameObject("CurrentScoreText");
+            scoreTextObj.transform.SetParent(panelObj.transform, false);
+            m_currentScoreText = scoreTextObj.AddComponent<Text>();
+            m_currentScoreText.font = Resources.Load<Font>("Fonts/Montserrat-Bold");
+            m_currentScoreText.fontSize = 20;
+            m_currentScoreText.alignment = TextAnchor.MiddleCenter;
+            m_currentScoreText.color = Color.cyan;
+            m_currentScoreText.text = "Score: 0/0";
+            RectTransform scoreRt = scoreTextObj.GetComponent<RectTransform>();
+            scoreRt.anchorMin = new Vector2(0, 0);
+            scoreRt.anchorMax = new Vector2(1, 0.2f);
+            scoreRt.anchoredPosition = new Vector2(0, 10);
 
             // Final Score Panel
             m_finalScorePanel = new GameObject("FinalScorePanel");
