@@ -19,9 +19,10 @@ namespace PassthroughCameraSamples.MultiObjectDetection
         [SerializeField] private Text m_finalScoreText;
         [SerializeField] private Text m_finalMessageText;
         [SerializeField] private Button m_restartButton;
+        [SerializeField] private Text m_quizModeGuideText;
 
         [Header("Settings")]
-        [SerializeField] private int m_questionsToAsk = 3;
+        [SerializeField] private int m_questionsToAsk = 5;
 
         private int m_currentQuestionCount = 0;
         private int m_currentScore = 0;
@@ -62,6 +63,9 @@ namespace PassthroughCameraSamples.MultiObjectDetection
 
             // Tell inference UI to hide labels
             if (m_inferenceUi) m_inferenceUi.SetQuizMode(true);
+
+            // Show quiz mode guide text
+            if (m_quizModeGuideText) m_quizModeGuideText.gameObject.SetActive(true);
 
             Debug.Log("Safety Quiz Started! Select an object.");
         }
@@ -152,9 +156,6 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             {
                 m_finalScorePanel.SetActive(true);
                 m_finalMessageText.text = "Keep learning and stay safe!";
-
-                // Auto-return to menu after 3 seconds
-                StartCoroutine(ReturnToMenuAfterDelay());
             }
         }
 
@@ -167,6 +168,9 @@ namespace PassthroughCameraSamples.MultiObjectDetection
         public void EndQuiz()
         {
             m_isQuizActive = false;
+
+            // Hide quiz mode guide text
+            if (m_quizModeGuideText) m_quizModeGuideText.gameObject.SetActive(false);
             if (m_quizPanel) m_quizPanel.SetActive(false);
             if (m_finalScorePanel) m_finalScorePanel.SetActive(false);
 
@@ -300,6 +304,23 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             // No close button - quiz auto-returns to menu after delay
             m_quizPanel.SetActive(false);
             m_finalScorePanel.SetActive(false);
+
+            // Create Quiz Mode Guide Text (persistent during quiz)
+            GameObject quizGuideObj = new GameObject("QuizModeGuideText");
+            quizGuideObj.transform.SetParent(canvasRoot.transform, false);
+            m_quizModeGuideText = quizGuideObj.AddComponent<Text>();
+            m_quizModeGuideText.font = Resources.Load<Font>("Fonts/Montserrat-Bold");
+            m_quizModeGuideText.fontSize = 22;
+            m_quizModeGuideText.alignment = TextAnchor.MiddleCenter;
+            m_quizModeGuideText.color = Color.yellow;
+            m_quizModeGuideText.text = "You are an employee who wants to test your ability.\nPress A to select and analyze objects.";
+            RectTransform qgRt = quizGuideObj.GetComponent<RectTransform>();
+            qgRt.anchorMin = new Vector2(0.5f, 0.5f);
+            qgRt.anchorMax = new Vector2(0.5f, 0.5f);
+            qgRt.pivot = new Vector2(0.5f, 0.5f);
+            qgRt.sizeDelta = new Vector2(800, 150);
+            qgRt.anchoredPosition = new Vector2(0, 200);
+            quizGuideObj.SetActive(false);
         }
 
         private Button CreateSimpleButton(GameObject parent, string text, Vector2 pos, Color color, UnityAction action)

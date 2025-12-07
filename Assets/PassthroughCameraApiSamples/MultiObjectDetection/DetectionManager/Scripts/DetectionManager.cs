@@ -191,7 +191,13 @@ namespace PassthroughCameraSamples.MultiObjectDetection
                 eMarker.transform.SetPositionAndRotation(position.Value, Quaternion.identity);
                 var anim = eMarker.GetComponent<DetectionSpawnMarkerAnim>();
                 anim.SetYoloClassName(className);
-                anim.SetVisual(m_uiInference.IsFireHazard(className));
+
+                // Only show visual icons if NOT in quiz mode
+                bool isQuiz = (m_quizManager != null && m_quizManager.IsQuizActive);
+                if (!isQuiz)
+                {
+                    anim.SetVisual(m_uiInference.IsFireHazard(className));
+                }
 
                 spawnedObject = eMarker;
             }
