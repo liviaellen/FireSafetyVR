@@ -151,9 +151,7 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             if (m_finalScorePanel)
             {
                 m_finalScorePanel.SetActive(true);
-                m_finalScoreText.text = "Quiz Complete!";
                 m_finalMessageText.text = "Keep learning and stay safe!";
-                m_finalMessageText.color = Color.yellow;
             }
         }
 
@@ -246,9 +244,10 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             m_resultText.alignment = TextAnchor.MiddleCenter;
             m_resultText.text = "";
             RectTransform rRt = rTextObj.GetComponent<RectTransform>();
-            rRt.anchorMin = new Vector2(0, 0.25f);
-            rRt.anchorMax = new Vector2(1, 0.45f);
-            rRt.anchoredPosition = new Vector2(0, -80);
+            rRt.anchorMin = new Vector2(0, 0.3f);
+            rRt.anchorMax = new Vector2(1, 0.5f);
+            rRt.offsetMin = Vector2.zero;
+            rRt.offsetMax = Vector2.zero;
 
             // Current Score Text (bottom of panel)
             GameObject scoreTextObj = new GameObject("CurrentScoreText");
@@ -261,10 +260,10 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             m_currentScoreText.text = "Score: 0/0";
             RectTransform scoreRt = scoreTextObj.GetComponent<RectTransform>();
             scoreRt.anchorMin = new Vector2(0, 0);
-            scoreRt.anchorMax = new Vector2(1, 0.2f);
-            scoreRt.anchoredPosition = new Vector2(0, 10);
+            scoreRt.anchorMax = new Vector2(1, 0.15f);
+            scoreRt.anchoredPosition = new Vector2(0, -10); // Moved lower
 
-            // Final Score Panel
+            // Final Score Panel - Only shows encouragement message
             m_finalScorePanel = new GameObject("FinalScorePanel");
             m_finalScorePanel.transform.SetParent(canvasRoot.transform, false);
             Image fbg = m_finalScorePanel.AddComponent<Image>();
@@ -272,35 +271,22 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             RectTransform frt = m_finalScorePanel.GetComponent<RectTransform>();
             frt.anchorMin = new Vector2(0.5f, 0.5f);
             frt.anchorMax = new Vector2(0.5f, 0.5f);
-            frt.sizeDelta = new Vector2(400, 300);
+            frt.sizeDelta = new Vector2(400, 200); // Smaller since no title/score
             frt.anchoredPosition = new Vector2(0, 0);
 
-            GameObject fTitle = new GameObject("FinalScoreTitle");
-            fTitle.transform.SetParent(m_finalScorePanel.transform, false);
-            Text ft = fTitle.AddComponent<Text>();
-            ft.font = Resources.Load<Font>("Fonts/Montserrat-Bold");
-            ft.fontSize = 32;
-            ft.alignment = TextAnchor.MiddleCenter;
-            ft.text = "Quiz Finished!";
-
-            GameObject fScore = new GameObject("FinalScoreText");
-            fScore.transform.SetParent(m_finalScorePanel.transform, false);
-            m_finalScoreText = fScore.AddComponent<Text>();
-            m_finalScoreText.font = Resources.Load<Font>("Fonts/Montserrat-Bold");
-            m_finalScoreText.fontSize = 28;
-            m_finalScoreText.alignment = TextAnchor.MiddleCenter;
-            m_finalScoreText.color = Color.white;
-            RectTransform fsrt = fScore.GetComponent<RectTransform>();
-            fsrt.anchoredPosition = new Vector2(0, 60);
-
+            // Only the encouragement message
             GameObject fMsg = new GameObject("FinalMessage");
             fMsg.transform.SetParent(m_finalScorePanel.transform, false);
             m_finalMessageText = fMsg.AddComponent<Text>();
             m_finalMessageText.font = Resources.Load<Font>("Fonts/Montserrat-Bold");
-            m_finalMessageText.fontSize = 20;
+            m_finalMessageText.fontSize = 24;
             m_finalMessageText.alignment = TextAnchor.MiddleCenter;
+            m_finalMessageText.color = Color.yellow;
             RectTransform fmrt = fMsg.GetComponent<RectTransform>();
-            fmrt.anchoredPosition = new Vector2(0, -60);
+            fmrt.anchorMin = new Vector2(0, 0.4f);
+            fmrt.anchorMax = new Vector2(1, 0.7f);
+            fmrt.offsetMin = Vector2.zero;
+            fmrt.offsetMax = Vector2.zero;
 
             m_restartButton = CreateSimpleButton(m_finalScorePanel, "Close", new Vector2(0, -100), Color.gray, EndQuiz);
 
