@@ -233,7 +233,7 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             infoText.fontSize = 16;
             infoText.alignment = TextAnchor.MiddleCenter;
             infoText.color = Color.yellow;
-            infoText.text = "Index Finger (A) = YES  |  Middle Finger (B) = NO";
+            infoText.text = "Index Finger = YES  |  Middle Finger = NO";
             RectTransform iRt = infoTextObj.GetComponent<RectTransform>();
             iRt.anchorMin = new Vector2(0, 0.55f);
             iRt.anchorMax = new Vector2(1, 0.65f);

@@ -314,6 +314,24 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             {
                 InitialMenuUpdate();
             }
+            else
+            {
+                // Menu button returns to main menu from any mode
+                if (OVRInput.GetUp(OVRInput.Button.Start))
+                {
+                    // Check if in quiz mode
+                    bool isQuiz = (m_quizManager != null && m_quizManager.IsQuizActive);
+                    if (isQuiz)
+                    {
+                        m_quizManager.EndQuiz();
+                    }
+                    else
+                    {
+                        // In inspector mode
+                        GoToMainMenu();
+                    }
+                }
+            }
         }
         #endregion
 
@@ -333,8 +351,15 @@ namespace PassthroughCameraSamples.MultiObjectDetection
         {
             m_initialMenu = true;
             IsPaused = true;
+            IsInputActive = false; // Disable input when in menu
             m_initialPanel.SetActive(true);
             m_noPermissionPanel.SetActive(false);
+
+            // Hide guide texts
+            if (m_inspectorGuideText != null)
+                m_inspectorGuideText.gameObject.SetActive(false);
+            if (m_quizGuideText != null)
+                m_quizGuideText.gameObject.SetActive(false);
         }
 
         private void InitialMenuUpdate()
