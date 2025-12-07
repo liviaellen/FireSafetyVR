@@ -59,5 +59,41 @@ namespace PassthroughCameraSamples.MultiObjectDetection
         {
             return m_textModel.text;
         }
+
+        public void SetVisual(bool isFireHazard)
+        {
+            // Hide the default 3D model and text
+            if (m_model) m_model.gameObject.SetActive(false);
+            if (m_textModel) m_textModel.gameObject.SetActive(false);
+
+            // Create or update the visual icon
+            var iconName = isFireHazard ? "FireIconSpawned" : "iceSpawned";
+            var existingIcon = transform.Find("SpawnedIcon");
+            if (existingIcon != null)
+            {
+                Destroy(existingIcon.gameObject);
+            }
+
+            GameObject iconObj = new GameObject("SpawnedIcon");
+            iconObj.transform.SetParent(transform, false);
+            iconObj.transform.localPosition = Vector3.zero;
+
+            // Use a SpriteRenderer
+            SpriteRenderer sr = iconObj.AddComponent<SpriteRenderer>();
+
+            string resourcePath = isFireHazard ? "Textures/FireIcon" : "Textures/ice";
+            Texture2D tex = Resources.Load<Texture2D>(resourcePath);
+            if (tex != null)
+            {
+                 sr.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+            }
+            else
+            {
+                // Fallback
+            }
+
+            // Adjust scale - world space
+            iconObj.transform.localScale = Vector3.one * 0.2f; // Adjust as needed
+        }
     }
 }

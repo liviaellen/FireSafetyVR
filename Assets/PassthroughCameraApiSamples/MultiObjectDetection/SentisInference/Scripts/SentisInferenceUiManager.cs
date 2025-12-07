@@ -33,6 +33,12 @@ namespace PassthroughCameraSamples.MultiObjectDetection
         private string[] m_labels;
         private List<GameObject> m_boxPool = new();
         private Transform m_displayLocation;
+        private bool m_isQuizMode = false;
+
+        public void SetQuizMode(bool active)
+        {
+            m_isQuizMode = active;
+        }
 
         private readonly Dictionary<string, bool> m_fireHazardMap = new Dictionary<string, bool>
         {
@@ -117,6 +123,15 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             { "hair drier", true },
             { "toothbrush", false }
         };
+
+        public bool IsFireHazard(string className)
+        {
+            if (m_fireHazardMap.TryGetValue(className, out bool isHazard))
+            {
+                return isHazard;
+            }
+            return false;
+        }
 
         //bounding box data
         public struct BoundingBox
@@ -213,7 +228,7 @@ namespace PassthroughCameraSamples.MultiObjectDetection
                     ClassName = classname,
                     Width = output[n, 2] * (displayWidth / imageWidth),
                     Height = output[n, 3] * (displayHeight / imageHeight),
-                    Label = $"{classname}\n{(isFireHazard ? "Fire Hazard" : "No Fire Hazard")}",
+                    Label = m_isQuizMode ? "?" : $"{classname}\n{(isFireHazard ? "Fire Hazard" : "No Fire Hazard")}",
                     WorldPos = worldPos,
                 };
 
@@ -221,7 +236,7 @@ namespace PassthroughCameraSamples.MultiObjectDetection
                 BoxDrawn.Add(box);
 
                 // Draw 2D box
-                DrawBox(box, n);
+                DrawBox(box, n, isFireHazard);
             }
         }
 
@@ -234,7 +249,7 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             BoxDrawn.Clear();
         }
 
-        private void DrawBox(BoundingBox box, int id)
+        private void DrawBox(BoundingBox box, int id, bool isFireHazard)
         {
             //Create the bounding box graphic or get from pool
             GameObject panel;
@@ -261,10 +276,43 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             //Set box size
             var rt = panel.GetComponent<RectTransform>();
             rt.sizeDelta = new Vector2(box.Width, box.Height);
+
+            // Set box color
+            var img = panel.GetComponent<Image>();
+            if (m_isQuizMode) {
+                img.color = Color.yellow; // Neutral color
+            } else {
+                img.color = isFireHazard ? Color.red : Color.blue;
+            }
+
             //Set label text
             var label = panel.GetComponentInChildren<Text>();
             label.text = box.Label;
-            label.fontSize = 12;
+            label.fontSize = 24;
+
+            // Handle Fire/Ice Icon
+            var fireIcon = panel.transform.Find("FireIcon");
+            var iceIcon = panel.transform.Find("IceIcon");
+
+            if (m_isQuizMode)
+            {
+                // Hide icons to not spoil the answer
+                if (fireIcon != null) fireIcon.gameObject.SetActive(false);
+                if (iceIcon != null) iceIcon.gameObject.SetActive(false);
+            }
+            else
+            {
+                if (isFireHazard)
+                {
+                    if (fireIcon != null) fireIcon.gameObject.SetActive(true);
+                    if (iceIcon != null) iceIcon.gameObject.SetActive(false);
+                }
+                else
+                {
+                    if (fireIcon != null) fireIcon.gameObject.SetActive(false);
+                    if (iceIcon != null) iceIcon.gameObject.SetActive(true);
+                }
+            }
         }
 
         private GameObject CreateNewBox(Color color)
@@ -288,6 +336,7 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             txt.color = m_fontColor;
             txt.fontSize = m_fontSize;
             txt.horizontalOverflow = HorizontalWrapMode.Overflow;
+            txt.alignment = TextAnchor.UpperRight;
 
             var rt2 = text.GetComponent<RectTransform>();
             rt2.offsetMin = new Vector2(20, rt2.offsetMin.y);
@@ -297,8 +346,58 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             rt2.anchorMin = new Vector2(0, 0);
             rt2.anchorMax = new Vector2(1, 1);
 
+            // Create Fire Icon
+            CreateIcon(panel, "FireIcon", "Textures/FireIcon", Color.white, true);
+
+            // Create Ice Icon (for safe objects) - Shifted left to avoid overlap
+            CreateIcon(panel, "IceIcon", "Textures/ice", new Color(0.6f, 0.8f, 1f), false, new Vector2(-60, -20)); // Shifted further left
+
             m_boxPool.Add(panel);
             return panel;
+        }
+
+        private void CreateIcon(GameObject parent, string name, string resourcePath, Color fallbackColor, bool wiggle, Vector2? posOverride = null)
+        {
+            var iconObj = new GameObject(name);
+            iconObj.transform.SetParent(parent.transform, false);
+            var iconImg = iconObj.AddComponent<Image>();
+
+            var iconSprite = Resources.Load<Texture2D>(resourcePath);
+            if (iconSprite != null)
+            {
+                 iconImg.sprite = Sprite.Create(iconSprite, new Rect(0, 0, iconSprite.width, iconSprite.height), new Vector2(0.5f, 0.5f));
+            }
+            else
+            {
+                // Fallback procedural texture if resource not found (e.g. IceIcon)
+                // Create a simple circle or square
+                Texture2D texture = new Texture2D(32, 32);
+                Color[] colors = new Color[32 * 32];
+                for (int i = 0; i < colors.Length; i++) colors[i] = fallbackColor;
+                texture.SetPixels(colors);
+                texture.Apply();
+                iconImg.sprite = Sprite.Create(texture, new Rect(0, 0, 32, 32), new Vector2(0.5f, 0.5f));
+            }
+
+            if (wiggle)
+            {
+                iconObj.AddComponent<WiggleAnimation>();
+            }
+
+            var iconRt = iconObj.GetComponent<RectTransform>();
+            iconRt.sizeDelta = new Vector2(40, 40); // Size of the icon
+            iconRt.anchorMin = new Vector2(1, 1); // Top right corner
+            iconRt.anchorMax = new Vector2(1, 1);
+            iconRt.pivot = new Vector2(0.5f, 0.5f);
+
+            // Use override or default
+            if (posOverride.HasValue)
+                iconRt.anchoredPosition = posOverride.Value;
+            else
+                iconRt.anchoredPosition = new Vector2(-20, -20); // Offset from corner
+
+            // Default to hidden
+            iconObj.SetActive(false);
         }
         #endregion
     }

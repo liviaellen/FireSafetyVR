@@ -10,7 +10,7 @@ namespace PassthroughCameraSamples.StartScene
     [MetaCodeSample("PassthroughCameraApiSamples-StartScene")]
     public class ReturnToStartScene : MonoBehaviour
     {
-        public bool ShowStartButtonTooltip = true;
+        public bool ShowStartButtonTooltip = false;
         private static ReturnToStartScene s_instance;
         [SerializeField] private GameObject m_tooltip;
         private const float FORWARDTOOLTIPOFFSET = -0.05f;
@@ -18,10 +18,11 @@ namespace PassthroughCameraSamples.StartScene
 
         private void Awake()
         {
+            ShowStartButtonTooltip = false;
             if (s_instance == null)
             {
                 s_instance = this;
-                m_tooltip.SetActive(ShowStartButtonTooltip);
+                m_tooltip.SetActive(false);
                 DontDestroyOnLoad(gameObject);
             }
             else if (s_instance != this)

@@ -38,6 +38,7 @@ namespace PassthroughCameraSamples.MultiObjectDetection
         private bool m_isStarted = false;
         private bool m_isSentisReady = false;
         private float m_delayPauseBackTime = 0;
+        private SafetyQuizManager m_quizManager;
 
         #region Unity Functions
         private void Awake() => OVRManager.display.RecenteredPose += CleanMarkersCallBack;
@@ -53,6 +54,8 @@ namespace PassthroughCameraSamples.MultiObjectDetection
                 yield return null;
             }
             m_isSentisReady = true;
+            m_isSentisReady = true;
+            m_quizManager = FindFirstObjectByType<SafetyQuizManager>();
         }
 
         private void Update()
@@ -117,12 +120,26 @@ namespace PassthroughCameraSamples.MultiObjectDetection
         /// </summary>
         private void SpwanCurrentDetectedObjects()
         {
+            if (m_quizManager == null) m_quizManager = FindFirstObjectByType<SafetyQuizManager>();
             var count = 0;
+            // Quiz Mode: Only pick one object at a time
+            bool isQuiz = (m_quizManager != null && m_quizManager.IsQuizActive);
+
             foreach (var box in m_uiInference.BoxDrawn)
             {
-                if (PlaceMarkerUsingEnvironmentRaycast(box.WorldPos, box.ClassName))
+                // In quiz mode, if we already picked one, stop.
+                if (isQuiz && count >= 1) break;
+
+                GameObject spawnedObj;
+                if (PlaceMarkerUsingEnvironmentRaycast(box.WorldPos, box.ClassName, out spawnedObj))
                 {
                     count++;
+                    if (isQuiz && spawnedObj != null)
+                    {
+                        // Check hazard map directly or rely on logic
+                        bool isHazard = m_uiInference.IsFireHazard(box.ClassName);
+                        m_quizManager.OnObjectSelected(spawnedObj, isHazard);
+                    }
                 }
             }
             if (count > 0)
@@ -136,8 +153,12 @@ namespace PassthroughCameraSamples.MultiObjectDetection
         /// <summary>
         /// Place a marker using the environment raycast
         /// </summary>
-        private bool PlaceMarkerUsingEnvironmentRaycast(Vector3? position, string className)
+        /// <summary>
+        /// Place a marker using the environment raycast
+        /// </summary>
+        private bool PlaceMarkerUsingEnvironmentRaycast(Vector3? position, string className, out GameObject spawnedObject)
         {
+            spawnedObject = null;
             // Check if the position is valid
             if (!position.HasValue)
             {
@@ -168,7 +189,11 @@ namespace PassthroughCameraSamples.MultiObjectDetection
 
                 // Update marker transform with the real world transform
                 eMarker.transform.SetPositionAndRotation(position.Value, Quaternion.identity);
-                eMarker.GetComponent<DetectionSpawnMarkerAnim>().SetYoloClassName(className);
+                var anim = eMarker.GetComponent<DetectionSpawnMarkerAnim>();
+                anim.SetYoloClassName(className);
+                anim.SetVisual(m_uiInference.IsFireHazard(className));
+
+                spawnedObject = eMarker;
             }
 
             return !existMarker;
