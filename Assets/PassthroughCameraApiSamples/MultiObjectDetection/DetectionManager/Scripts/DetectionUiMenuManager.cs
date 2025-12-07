@@ -401,21 +401,10 @@ namespace PassthroughCameraSamples.MultiObjectDetection
 
         private IEnumerator StartQuizWithDelay()
         {
-            // Hide inspector guide, show quiz guide
-            if (m_inspectorGuideText != null)
-                m_inspectorGuideText.gameObject.SetActive(false);
-            if (m_quizGuideText != null)
-                m_quizGuideText.gameObject.SetActive(true);
-
-            // Wait 5 seconds
-            yield return new WaitForSeconds(5f);
-
-            // Hide guide and start quiz
-            if (m_quizGuideText != null)
-                m_quizGuideText.gameObject.SetActive(false);
-
+            // No delay - start quiz immediately
             m_quizManager.StartQuiz();
-            // Note: Do NOT set IsInputActive = true here - quiz has its own input handling
+            IsInputActive = true; // Quiz needs detection active to select objects
+            yield break;
         }
 
         private void CreateMainMenu()
@@ -604,17 +593,21 @@ namespace PassthroughCameraSamples.MultiObjectDetection
         #region Ui state: detection information
         private void UpdateLabelInformation()
         {
+            bool isQuiz = (m_quizManager != null && m_quizManager.IsQuizActive);
+
             string text = $"Unity Sentis version: 2.1.3\nAI model: Yolo\nDetecting objects: {m_objectsDetected}\nObjects identified: {m_objectsIdentified}";
-            if (!m_initialMenu)
+
+            // Only show inspector instructions if NOT in menu AND NOT in quiz
+            if (!m_initialMenu && !isQuiz)
             {
                 text += "\n\nPress A to mark object";
             }
+
             m_labelInformation.text = text;
 
             // Should also check here for Guide Text visibility incase states changed else where
             if (m_inspectorGuideText != null)
             {
-                 bool isQuiz = (m_quizManager != null && m_quizManager.IsQuizActive);
                  // If NOT initial menu AND NOT quiz -> Show
                  m_inspectorGuideText.gameObject.SetActive(!m_initialMenu && !isQuiz);
             }

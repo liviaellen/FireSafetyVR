@@ -102,6 +102,44 @@ Perfect for:
 - Workplace safety education
 - Home fire prevention awareness
 
+## AI Model & Architecture
+
+### Object Detection Model
+- **Model**: YOLOv8 (You Only Look Once)
+- **Dataset**: COCO (Common Objects in Context) - 80 object classes
+- **Framework**: Unity Sentis 2.1.3
+- **Input**: 640x640 RGB camera frames from Quest passthrough
+- **Output**: Bounding boxes, class labels, confidence scores
+- **Inference Speed**: Real-time (~30ms per frame on Quest 3)
+
+### Model Pipeline
+1. **Camera Capture**: Quest passthrough cameras provide RGB frames
+2. **Preprocessing**: Frames resized to 640x640, normalized
+3. **Inference**: YOLO model runs on-device via Unity Sentis
+4. **Post-processing**: Non-maximum suppression, confidence filtering
+5. **Classification**: Objects mapped to fire hazard categories
+6. **Visualization**: Bounding boxes and icons rendered in 3D space
+
+### Fire Hazard Mapping
+The game uses a custom classification layer on top of YOLO's 80 COCO classes:
+
+```
+YOLO Detection → Fire Risk Assessment → Visual Feedback
+
+laptop        → HIGH RISK  → Red box + Flame icon
+oven          → HIGH RISK  → Red box + Flame icon
+microwave     → HIGH RISK  → Red box + Flame icon
+person        → SAFE       → Blue box + Ice icon
+chair         → SAFE       → Blue box + Ice icon
+book          → SAFE       → Blue box + Ice icon
+```
+
+### On-Device Processing
+- **No Cloud Required**: All AI runs locally on Quest hardware
+- **Privacy First**: Camera data never leaves your device
+- **Low Latency**: Instant detection and feedback
+- **Offline Capable**: Works without internet connection
+
 ## Technical Details
 
 - **Platform**: Unity 6000.0.38f1
