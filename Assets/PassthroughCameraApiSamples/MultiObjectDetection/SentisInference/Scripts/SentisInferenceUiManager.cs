@@ -349,8 +349,8 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             // Create Fire Icon
             CreateIcon(panel, "FireIcon", "Textures/FireIcon", Color.white, true);
 
-            // Create Ice Icon (for safe objects) - Shifted left to avoid overlap
-            CreateIcon(panel, "IceIcon", "Textures/ice", new Color(0.6f, 0.8f, 1f), false, new Vector2(-60, -20)); // Shifted further left
+            // Create Ice Icon (for safe objects) - Shifted right and up to avoid overlap
+            CreateIcon(panel, "IceIcon", "Textures/ice", new Color(0.6f, 0.8f, 1f), false, new Vector2(15, 25)); // Shifted outside corner
 
             m_boxPool.Add(panel);
             return panel;

@@ -27,6 +27,7 @@ namespace PassthroughCameraSamples.MultiObjectDetection
         private int m_currentScore = 0;
         private bool m_isQuizActive = false;
         private GameObject m_currentSelectedObject;
+        private bool m_currentIsFireHazard;
         private bool m_canAnswer = false;
 
         public bool IsQuizActive => m_isQuizActive;
@@ -71,12 +72,21 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             if (m_currentQuestionCount >= m_questionsToAsk) return;
 
             m_currentSelectedObject = selectedObj;
+            m_currentIsFireHazard = isFireHazard;
+
+            // Try to get class name
+            string className = "object";
+            var marker = selectedObj.GetComponent<DetectionSpawnMarkerAnim>();
+            if (marker != null)
+            {
+                className = marker.GetYoloClassName();
+            }
 
             // Show Question UI
             if (m_quizPanel)
             {
                 m_quizPanel.SetActive(true);
-                m_questionText.text = "Is this object a Fire Hazard?";
+                m_questionText.text = $"Is this {className} a Fire Hazard?";
                 m_resultText.text = ""; // Clear previous result
 
                 // We need to store the correct answer for the button callbacks
@@ -98,14 +108,8 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             if (!m_canAnswer) return;
             if (m_currentSelectedObject == null) return;
 
-            // Determine if it actually is a hazard
-            bool isActuallyHazard = false;
-            if (m_inferenceUi != null)
-            {
-                // We can check the dictionary in inference UI or rely on the label data
-                // For robustness, let's ask the inference UI
-                 isActuallyHazard = m_inferenceUi.IsFireHazard(m_currentSelectedObject.name);
-            }
+            // Use the stored truth value (reliable)
+            bool isActuallyHazard = m_currentIsFireHazard;
 
             bool isCorrect = (userSaidYes == isActuallyHazard);
 
@@ -147,7 +151,8 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             if (m_finalScorePanel)
             {
                 m_finalScorePanel.SetActive(true);
-                m_finalScoreText.text = $"Final Score: {m_currentScore}/{m_questionsToAsk}";
+                int percentage = (int)((float)m_currentScore / m_questionsToAsk * 100);
+                m_finalScoreText.text = $"Final Score: {percentage}%";
 
                 if (m_currentScore == m_questionsToAsk)
                 {
@@ -291,7 +296,7 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             m_finalMessageText.fontSize = 20;
             m_finalMessageText.alignment = TextAnchor.MiddleCenter;
             RectTransform fmrt = fMsg.GetComponent<RectTransform>();
-            fmrt.anchoredPosition = new Vector2(0, -40);
+            fmrt.anchoredPosition = new Vector2(0, -60);
 
             m_restartButton = CreateSimpleButton(m_finalScorePanel, "Close", new Vector2(0, -100), Color.gray, EndQuiz);
 

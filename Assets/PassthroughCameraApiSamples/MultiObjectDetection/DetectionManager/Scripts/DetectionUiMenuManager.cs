@@ -22,6 +22,9 @@ namespace PassthroughCameraSamples.MultiObjectDetection
         [SerializeField] private Text m_labelInformation;
         [SerializeField] private AudioSource m_buttonSound;
 
+        private Text m_inspectorGuideText; // New guide text
+        private Text m_quizGuideText; // Quiz mode guide text
+
         public bool IsInputActive { get; set; } = false;
 
         public UnityEvent<bool> OnPause;
@@ -132,6 +135,14 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             }
 
             CreateMainMenu();
+
+            // Create Inspector Guide Text
+            CreateInspectorGuideText();
+
+            // Create Quiz Guide Text
+            CreateQuizGuideText();
+
+            // Auto-configure VR Input for UI
 
             // Auto-configure VR Input for UI
             SetupVRInput();
@@ -332,7 +343,7 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             if (OVRInput.GetUp(OVRInput.Button.One))
             {
                  m_buttonSound?.Play();
-                 OnPauseMenu(false);
+                 OnPauseMenu(0); // Call new OnPauseMenu with index
             }
 
             // Shortcut B: Learn Safety Hazard (Quiz)
@@ -341,10 +352,70 @@ namespace PassthroughCameraSamples.MultiObjectDetection
                 m_buttonSound?.Play();
                 if (m_quizManager != null)
                 {
-                    m_quizManager.StartQuiz();
-                    OnPauseMenu(false); // Hide main menu, start loop
+                    OnPauseMenu(1); // Call new OnPauseMenu with index
                 }
             }
+        }
+
+        public void OnPauseMenu(int index)
+        {
+            m_initialMenu = false;
+            m_initialPanel.SetActive(false);
+            m_noPermissionPanel.SetActive(false);
+            IsPaused = false; // Unpause when starting a mode
+
+            // Hide all guide texts initially
+            if (m_inspectorGuideText != null) m_inspectorGuideText.gameObject.SetActive(false);
+            if (m_quizGuideText != null) m_quizGuideText.gameObject.SetActive(false);
+
+            if (index == 0) // Fire Inspector
+            {
+                StartCoroutine(StartInspectorWithDelay());
+            }
+            else if (index == 1) // Quiz Mode
+            {
+                if (m_quizManager != null)
+                {
+                    StartCoroutine(StartQuizWithDelay());
+                }
+            }
+            OnPause?.Invoke(false); // Notify that we are unpausing
+        }
+
+        private IEnumerator StartInspectorWithDelay()
+        {
+            // Hide quiz guide, show inspector guide
+            if (m_quizGuideText != null)
+                m_quizGuideText.gameObject.SetActive(false);
+            if (m_inspectorGuideText != null)
+                m_inspectorGuideText.gameObject.SetActive(true);
+
+            // Wait 5 seconds
+            yield return new WaitForSeconds(5f);
+
+            // Hide guide and start detection
+            if (m_inspectorGuideText != null)
+                m_inspectorGuideText.gameObject.SetActive(false);
+            IsInputActive = true;
+        }
+
+        private IEnumerator StartQuizWithDelay()
+        {
+            // Hide inspector guide, show quiz guide
+            if (m_inspectorGuideText != null)
+                m_inspectorGuideText.gameObject.SetActive(false);
+            if (m_quizGuideText != null)
+                m_quizGuideText.gameObject.SetActive(true);
+
+            // Wait 5 seconds
+            yield return new WaitForSeconds(5f);
+
+            // Hide guide and start quiz
+            if (m_quizGuideText != null)
+                m_quizGuideText.gameObject.SetActive(false);
+
+            m_quizManager.StartQuiz();
+            // Note: Do NOT set IsInputActive = true here - quiz has its own input handling
         }
 
         private void CreateMainMenu()
@@ -375,17 +446,13 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             CreateButton(menuContainer, "Fire Inspector (A)", font, () =>
             {
                 m_buttonSound?.Play();
-                OnPauseMenu(false);
+                OnPauseMenu(0);
             });
 
             CreateButton(menuContainer, "Learn Safety Hazard (B)", font, () =>
             {
                 m_buttonSound?.Play();
-                if (m_quizManager != null)
-                {
-                    m_quizManager.StartQuiz();
-                    OnPauseMenu(false);
-                }
+                OnPauseMenu(1);
             });
         }
 
@@ -467,6 +534,65 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             m_noPermissionPanel.SetActive(false);
 
             OnPause?.Invoke(visible);
+
+            // Update Guide Visibility
+            if (m_inspectorGuideText != null)
+            {
+                 // Show only if NOT visible (meaning we are playing) AND Quiz is NOT active
+                 bool isQuiz = (m_quizManager != null && m_quizManager.IsQuizActive);
+                 m_inspectorGuideText.gameObject.SetActive(!visible && !isQuiz);
+            }
+
+            if (m_quizGuideText != null)
+            {
+                m_quizGuideText.gameObject.SetActive(false);
+            }
+        }
+
+        private void CreateInspectorGuideText()
+        {
+            GameObject textObj = new GameObject("InspectorGuideText");
+            textObj.transform.SetParent(m_initialPanel.transform.parent, false); // Parent to Canvas, not panel so it persists? Or just manage visibility manually.
+            // Actually, let's parent to the same Canvas root as initial panel to ensure it's in the same space
+
+            m_inspectorGuideText = textObj.AddComponent<Text>();
+            m_inspectorGuideText.font = Resources.Load<Font>("Fonts/Montserrat-Bold");
+            m_inspectorGuideText.fontSize = 24; // Readable size
+            m_inspectorGuideText.alignment = TextAnchor.MiddleCenter;
+            m_inspectorGuideText.color = Color.yellow; // Better contrast
+            m_inspectorGuideText.text = "You are a building inspector.\nStart recording video to document your assessment.\nThe AI model will verify if items are fire hazards.\nPress A to mark your assessment.";
+
+            RectTransform rt = textObj.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.5f, 0.5f); // Center
+            rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.sizeDelta = new Vector2(800, 200); // Wider to prevent wrapping
+            rt.anchoredPosition = new Vector2(0, 200); // Shifted UP from center (lowered from 350)
+
+            // Default to hidden
+            textObj.SetActive(false);
+        }
+
+        private void CreateQuizGuideText()
+        {
+            GameObject textObj = new GameObject("QuizGuideText");
+            textObj.transform.SetParent(m_initialPanel.transform.parent, false);
+
+            m_quizGuideText = textObj.AddComponent<Text>();
+            m_quizGuideText.font = Resources.Load<Font>("Fonts/Montserrat-Bold");
+            m_quizGuideText.fontSize = 24;
+            m_quizGuideText.alignment = TextAnchor.MiddleCenter;
+            m_quizGuideText.color = Color.yellow;
+            m_quizGuideText.text = "You are a worker learning about fire safety.\nAssess your knowledge: Is each item a fire hazard or not?\nPress A to select an object and answer.";
+
+            RectTransform rt = textObj.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.5f, 0.5f);
+            rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.sizeDelta = new Vector2(800, 200);
+            rt.anchoredPosition = new Vector2(0, 200);
+
+            textObj.SetActive(false);
         }
 
         public void GoToMainMenu()
@@ -484,6 +610,14 @@ namespace PassthroughCameraSamples.MultiObjectDetection
                 text += "\n\nPress A to mark object";
             }
             m_labelInformation.text = text;
+
+            // Should also check here for Guide Text visibility incase states changed else where
+            if (m_inspectorGuideText != null)
+            {
+                 bool isQuiz = (m_quizManager != null && m_quizManager.IsQuizActive);
+                 // If NOT initial menu AND NOT quiz -> Show
+                 m_inspectorGuideText.gameObject.SetActive(!m_initialMenu && !isQuiz);
+            }
         }
 
         public void OnObjectsDetected(int objects)
