@@ -34,6 +34,90 @@ namespace PassthroughCameraSamples.MultiObjectDetection
         private List<GameObject> m_boxPool = new();
         private Transform m_displayLocation;
 
+        private readonly Dictionary<string, bool> m_fireHazardMap = new Dictionary<string, bool>
+        {
+            { "person", false },
+            { "bicycle", false },
+            { "car", true },
+            { "motorbike", true },
+            { "aeroplane", true },
+            { "bus", true },
+            { "train", true },
+            { "truck", true },
+            { "boat", true },
+            { "traffic light", false },
+            { "fire hydrant", false },
+            { "stop sign", false },
+            { "parking meter", false },
+            { "bench", false },
+            { "bird", false },
+            { "cat", false },
+            { "dog", false },
+            { "horse", false },
+            { "sheep", false },
+            { "cow", false },
+            { "elephant", false },
+            { "bear", false },
+            { "zebra", false },
+            { "giraffe", false },
+            { "backpack", true },
+            { "umbrella", false },
+            { "handbag", true },
+            { "tie", false },
+            { "suitcase", true },
+            { "frisbee", false },
+            { "skis", false },
+            { "snowboard", false },
+            { "sports ball", false },
+            { "kite", false },
+            { "baseball bat", false },
+            { "baseball glove", false },
+            { "skateboard", false },
+            { "surfboard", false },
+            { "tennis racket", false },
+            { "bottle", true },
+            { "wine glass", false },
+            { "cup", false },
+            { "fork", false },
+            { "knife", false },
+            { "spoon", false },
+            { "bowl", false },
+            { "banana", false },
+            { "apple", false },
+            { "sandwich", false },
+            { "orange", false },
+            { "broccoli", false },
+            { "carrot", false },
+            { "hot dog", false },
+            { "pizza", false },
+            { "donut", false },
+            { "cake", false },
+            { "chair", false },
+            { "sofa", true },
+            { "pottedplant", false },
+            { "bed", true },
+            { "diningtable", false },
+            { "toilet", false },
+            { "tvmonitor", true },
+            { "laptop", true },
+            { "mouse", false },
+            { "remote", true },
+            { "keyboard", false },
+            { "cell phone", true },
+            { "microwave", true },
+            { "oven", true },
+            { "toaster", true },
+            { "sink", false },
+            { "refrigerator", true },
+            { "book", true },
+            { "clock", false },
+            { "vase", false },
+            { "scissors", false },
+            { "teddy bear", true },
+            { "hair drier", true },
+            { "toothbrush", false }
+        };
+
         //bounding box data
         public struct BoundingBox
         {
@@ -114,6 +198,13 @@ namespace PassthroughCameraSamples.MultiObjectDetection
                 var ray = m_cameraAccess.ViewportPointToRay(new Vector2(normalizedCenterX, 1.0f - normalizedCenterY), cameraPose);
                 var worldPos = m_environmentRaycast.Raycast(ray);
 
+                var rawLabel = m_labels[labelIDs[n]].Trim();
+                bool isFireHazard = false;
+                if (m_fireHazardMap.TryGetValue(rawLabel, out bool hazard))
+                {
+                    isFireHazard = hazard;
+                }
+
                 // Create a new bounding box
                 var box = new BoundingBox
                 {
@@ -122,7 +213,7 @@ namespace PassthroughCameraSamples.MultiObjectDetection
                     ClassName = classname,
                     Width = output[n, 2] * (displayWidth / imageWidth),
                     Height = output[n, 3] * (displayHeight / imageHeight),
-                    Label = $"Id: {n} Class: {classname} Center (px): {(int)centerX},{(int)centerY} Center (%): {normalizedCenterX:0.00},{normalizedCenterY:0.00}",
+                    Label = $"{classname}\n{(isFireHazard ? "Fire Hazard" : "No Fire Hazard")}",
                     WorldPos = worldPos,
                 };
 
