@@ -152,7 +152,16 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             {
                 m_finalScorePanel.SetActive(true);
                 m_finalMessageText.text = "Keep learning and stay safe!";
+
+                // Auto-return to menu after 3 seconds
+                StartCoroutine(ReturnToMenuAfterDelay());
             }
+        }
+
+        private IEnumerator ReturnToMenuAfterDelay()
+        {
+            yield return new WaitForSeconds(3f);
+            EndQuiz();
         }
 
         public void EndQuiz()
@@ -244,8 +253,8 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             m_resultText.alignment = TextAnchor.MiddleCenter;
             m_resultText.text = "";
             RectTransform rRt = rTextObj.GetComponent<RectTransform>();
-            rRt.anchorMin = new Vector2(0, 0.3f);
-            rRt.anchorMax = new Vector2(1, 0.5f);
+            rRt.anchorMin = new Vector2(0, 0.2f);
+            rRt.anchorMax = new Vector2(1, 0.4f);
             rRt.offsetMin = Vector2.zero;
             rRt.offsetMax = Vector2.zero;
 
@@ -288,8 +297,7 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             fmrt.offsetMin = Vector2.zero;
             fmrt.offsetMax = Vector2.zero;
 
-            m_restartButton = CreateSimpleButton(m_finalScorePanel, "Close", new Vector2(0, -100), Color.gray, EndQuiz);
-
+            // No close button - quiz auto-returns to menu after delay
             m_quizPanel.SetActive(false);
             m_finalScorePanel.SetActive(false);
         }
