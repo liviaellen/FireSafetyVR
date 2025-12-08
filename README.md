@@ -2,6 +2,8 @@
 
 **An AI-Powered Fire Safety Training Game for Meta Quest**
 
+![Kitchen Demo](https://github.com/liviaellen/FireSafetyVR/blob/4aafdb69e0edd932c06d38add8e028ad8b0ba54c/image/kitchen.gif)
+
 Don't Let it Spark XR is an immersive VR training game that teaches fire safety through real-world object detection. Using your Quest's passthrough cameras and AI, the game helps you identify fire hazards in your actual environment.
 
 ## Game Modes
@@ -10,6 +12,8 @@ Don't Let it Spark XR is an immersive VR training game that teaches fire safety 
 **Role**: You are a building inspector conducting a safety assessment.
 
 **Objective**: Identify and document fire hazards in your environment.
+
+![Auto Labeling](https://github.com/liviaellen/FireSafetyVR/blob/4aafdb69e0edd932c06d38add8e028ad8b0ba54c/image/spark%20label.gif)
 
 **Gameplay**:
 1. Press **A** to start Inspector Mode
@@ -30,6 +34,8 @@ Don't Let it Spark XR is an immersive VR training game that teaches fire safety 
 **Role**: You are a worker learning about fire safety.
 
 **Objective**: Test your knowledge by identifying fire hazards correctly.
+
+![Quiz Mode](https://github.com/liviaellen/FireSafetyVR/blob/4aafdb69e0edd932c06d38add8e028ad8b0ba54c/image/laptop.gif)
 
 **Gameplay**:
 1. Press **B** to start Quiz Mode
@@ -111,6 +117,8 @@ Perfect for:
 - **Input**: 640x640 RGB camera frames from Quest passthrough
 - **Output**: Bounding boxes, class labels, confidence scores
 - **Inference Speed**: Real-time (~30ms per frame on Quest 3)
+
+![YOLO Detection Example](https://github.com/liviaellen/FireSafetyVR/blob/4aafdb69e0edd932c06d38add8e028ad8b0ba54c/image/person.gif)
 
 ### Model Pipeline
 1. **Camera Capture**: Quest passthrough cameras provide RGB frames
