@@ -24,6 +24,11 @@ namespace PassthroughCameraSamples.MultiObjectDetection
         [Header("Settings")]
         [SerializeField] private int m_questionsToAsk = 5;
 
+        [Header("Audio")]
+        [SerializeField] private AudioClip m_correctAnswerClip;
+        [SerializeField] private AudioClip m_wrongAnswerClip;
+        private AudioSource m_audioSource;
+
         private int m_currentQuestionCount = 0;
         private int m_currentScore = 0;
         private bool m_isQuizActive = false;
@@ -40,6 +45,23 @@ namespace PassthroughCameraSamples.MultiObjectDetection
         {
             m_menuManager = FindFirstObjectByType<DetectionUiMenuManager>();
             m_inferenceUi = FindFirstObjectByType<SentisInferenceUiManager>();
+
+            // Setup audio source
+            m_audioSource = gameObject.GetComponent<AudioSource>();
+            if (m_audioSource == null)
+            {
+                m_audioSource = gameObject.AddComponent<AudioSource>();
+            }
+
+            // Load audio clips from Resources folder if not assigned
+            if (m_correctAnswerClip == null)
+            {
+                m_correctAnswerClip = Resources.Load<AudioClip>("Audio/correct answer");
+            }
+            if (m_wrongAnswerClip == null)
+            {
+                m_wrongAnswerClip = Resources.Load<AudioClip>("Audio/wrong answer");
+            }
 
             // Ensure UI is hidden at start
             if (m_quizPanel) m_quizPanel.SetActive(false);
@@ -122,11 +144,23 @@ namespace PassthroughCameraSamples.MultiObjectDetection
                 m_currentScore++;
                 m_resultText.text = "Correct!";
                 m_resultText.color = Color.green;
+
+                // Play correct answer sound
+                if (m_audioSource && m_correctAnswerClip)
+                {
+                    m_audioSource.PlayOneShot(m_correctAnswerClip);
+                }
             }
             else
             {
                 m_resultText.text = "Wrong!";
                 m_resultText.color = Color.red;
+
+                // Play wrong answer sound
+                if (m_audioSource && m_wrongAnswerClip)
+                {
+                    m_audioSource.PlayOneShot(m_wrongAnswerClip);
+                }
             }
 
             m_currentQuestionCount++;

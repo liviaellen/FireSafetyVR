@@ -144,8 +144,6 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             CreateQuizGuideText();
 
             // Auto-configure VR Input for UI
-
-            // Auto-configure VR Input for UI
             SetupVRInput();
 
             // Ensure input loop runs for shortcuts
@@ -322,6 +320,7 @@ namespace PassthroughCameraSamples.MultiObjectDetection
                 {
                     // Check if in quiz mode
                     bool isQuiz = (m_quizManager != null && m_quizManager.IsQuizActive);
+
                     if (isQuiz)
                     {
                         m_quizManager.EndQuiz();
