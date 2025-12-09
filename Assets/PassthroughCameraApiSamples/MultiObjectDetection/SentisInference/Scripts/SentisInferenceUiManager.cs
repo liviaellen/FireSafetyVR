@@ -34,10 +34,16 @@ namespace PassthroughCameraSamples.MultiObjectDetection
         private List<GameObject> m_boxPool = new();
         private Transform m_displayLocation;
         private bool m_isQuizMode = false;
+        private bool m_isTrainingMode = false;
 
         public void SetQuizMode(bool active)
         {
             m_isQuizMode = active;
+        }
+
+        public void SetTrainingMode(bool active)
+        {
+            m_isTrainingMode = active;
         }
 
         private readonly Dictionary<string, bool> m_fireHazardMap = new Dictionary<string, bool>
@@ -235,8 +241,11 @@ namespace PassthroughCameraSamples.MultiObjectDetection
                 // Add to the list of boxes
                 BoxDrawn.Add(box);
 
-                // Draw 2D box
-                DrawBox(box, n, isFireHazard);
+                // Draw 2D box (skip if in training mode)
+                if (!m_isTrainingMode)
+                {
+                    DrawBox(box, n, isFireHazard);
+                }
             }
         }
 

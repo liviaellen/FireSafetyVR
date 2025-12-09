@@ -54,7 +54,6 @@ namespace PassthroughCameraSamples.MultiObjectDetection
                 yield return null;
             }
             m_isSentisReady = true;
-            m_isSentisReady = true;
             m_quizManager = FindFirstObjectByType<SafetyQuizManager>();
         }
 
