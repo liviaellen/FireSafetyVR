@@ -54,16 +54,17 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             }
             m_loadingPanel.SetActive(false);
 
-            // Wait for permissions
-            OnNoPermissionMenu();
-            UnityEngine.Android.Permission.RequestUserPermission("horizonos.permission.HEADSET_CAMERA");
-            while (!OVRPermissionsRequester.IsPermissionGranted(OVRPermissionsRequester.Permission.Scene) ||
-                   !OVRPermissionsRequester.IsPermissionGranted(OVRPermissionsRequester.Permission.PassthroughCameraAccess) ||
-                   !UnityEngine.Android.Permission.HasUserAuthorizedPermission("android.permission.CAMERA") ||
-                   !UnityEngine.Android.Permission.HasUserAuthorizedPermission("horizonos.permission.HEADSET_CAMERA"))
-            {
-                yield return null;
-            }
+            // Wait for permissions - COMMENTED OUT to prevent permission prompts on every launch
+            // Permissions are already declared in AndroidManifest.xml
+            // OnNoPermissionMenu();
+            // UnityEngine.Android.Permission.RequestUserPermission("horizonos.permission.HEADSET_CAMERA");
+            // while (!OVRPermissionsRequester.IsPermissionGranted(OVRPermissionsRequester.Permission.Scene) ||
+            //        !OVRPermissionsRequester.IsPermissionGranted(OVRPermissionsRequester.Permission.PassthroughCameraAccess) ||
+            //        !UnityEngine.Android.Permission.HasUserAuthorizedPermission("android.permission.CAMERA") ||
+            //        !UnityEngine.Android.Permission.HasUserAuthorizedPermission("horizonos.permission.HEADSET_CAMERA"))
+            // {
+            //     yield return null;
+            // }
 
             // Setup Launcher UI
             var audioClip = Resources.Load<AudioClip>("Audio/spark");
